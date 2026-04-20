@@ -12,7 +12,11 @@ export default async (req) => {
     return new Response("Bad request", { status: 400 });
   }
 
-  const { gifts } = body;
+  const { password, gifts } = body;
+
+  if (!password || password !== process.env.ADMIN_PASSWORD) {
+    return new Response("Unauthorized", { status: 401 });
+  }
 
   if (!Array.isArray(gifts)) {
     return new Response("Invalid gifts data", { status: 400 });
