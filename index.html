@@ -3,8 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Isha's Space Party – Geschenkwünsche 🚀</title>
+<title data-i18n="title">Isha's Space Party – Geschenkwünsche 🚀</title>
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
 <style>
   :root {
     --space-deep:   #05051a;
@@ -57,17 +58,31 @@
     padding:2.5rem 1.5rem 5rem;
   }
 
+  /* ── Language toggle ── */
+  .lang-toggle {
+    position:fixed; top:1rem; right:1rem; z-index:200;
+    display:flex; gap:8px; align-items:center;
+    background:rgba(5,5,26,.92); border:1px solid rgba(168,85,247,.45);
+    border-radius:50px; padding:6px 12px;
+  }
+  .lang-btn {
+    background:transparent; border:none; color:var(--text-muted);
+    font-size:.85rem; font-weight:700; cursor:pointer;
+    font-family:'Nunito',sans-serif; transition:color .2s;
+    padding:2px 8px;
+  }
+  .lang-btn.active { color:var(--pink); }
+  .lang-btn:hover { color:var(--text); }
+
   /* ── Header ── */
   header { text-align:center; padding-bottom:2rem; }
 
   .rocket-wrap {
-    display:inline-block; font-size:3.5rem; margin-bottom:.6rem;
-    animation:float 3.5s ease-in-out infinite;
+    display:inline-block; width:140px; height:140px; margin-bottom:.6rem;
+    user-select:none;
+    filter: drop-shadow(0 0 18px rgba(232,121,249,.35)) drop-shadow(0 0 6px rgba(103,232,249,.25));
   }
-  @keyframes float {
-    0%,100% { transform:translateY(0) rotate(-5deg); }
-    50%      { transform:translateY(-14px) rotate(5deg); }
-  }
+  .rocket-wrap lottie-player { width:100%; height:100%; }
 
   h1 {
     font-family:'Orbitron',sans-serif;
@@ -99,6 +114,14 @@
     margin-bottom:1.4rem;
   }
   .hint-box strong { color:var(--cyan); }
+
+  /* ── Presence banner ── */
+  .presence-banner {
+    background:rgba(251,191,36,.08); border:1px solid rgba(251,191,36,.3);
+    border-radius:14px; padding:.85rem 1.1rem;
+    font-size:.86rem; color:#fde68a; line-height:1.55; text-align:center;
+    margin-bottom:1.4rem;
+  }
 
   /* ── Legend ── */
   .legend {
@@ -218,6 +241,28 @@
 
   .ref-note { font-size:.7rem; color:#475569; font-style:italic; flex-basis:100%; margin-top:2px; }
 
+  /* ── WhatsApp button ── */
+  .btn-wa {
+    position:relative; display:inline-flex; align-items:center; justify-content:center;
+    width:36px; height:36px; border-radius:50%; background:#25D366; border:none;
+    cursor:pointer; flex-shrink:0; text-decoration:none;
+    transition:transform .2s, box-shadow .2s;
+    box-shadow:0 2px 8px rgba(37,211,102,.25);
+  }
+  .btn-wa:hover { transform:scale(1.12); box-shadow:0 0 16px rgba(37,211,102,.45); }
+  .btn-wa svg { width:20px; height:20px; display:block; }
+  .wa-tooltip {
+    position:absolute; bottom:calc(100% + 8px); left:50%; transform:translateX(-50%);
+    background:rgba(15,15,58,.97); border:1px solid rgba(37,211,102,.35);
+    border-radius:8px; padding:5px 10px;
+    font-size:.71rem; font-weight:700; color:#a7f3d0; font-family:'Nunito',sans-serif;
+    white-space:nowrap; pointer-events:none;
+    opacity:0; transition:opacity .2s;
+  }
+  .btn-wa:hover .wa-tooltip { opacity:1; }
+
+  .badge-bringing { font-size:.76rem; color:var(--text-muted); font-style:italic; }
+
   .btn-admin {
     display:none; background:transparent;
     border:1px solid rgba(255,255,255,.1); color:var(--text-muted);
@@ -290,6 +335,8 @@
     .gift-grid { grid-template-columns:1fr; }
     h1 { font-size:1.5rem; }
     .party-details { gap:.8rem; font-size:.77rem; }
+    .lang-toggle { top:.75rem; right:.75rem; gap:6px; padding:5px 10px; }
+    .lang-btn { padding:2px 6px; font-size:.8rem; }
   }
 </style>
 </head>
@@ -302,39 +349,50 @@
 <div class="nebula n3"></div>
 <div class="toast" id="toast"></div>
 
+<!-- Language toggle -->
+<div class="lang-toggle">
+  <button class="lang-btn active" data-lang="de" onclick="setLang('de')">DE</button>
+  <span style="color:var(--text-muted);font-size:.7rem;">|</span>
+  <button class="lang-btn" data-lang="en" onclick="setLang('en')">EN</button>
+</div>
+
 <div class="container">
   <header>
-    <div class="rocket-wrap">🚀</div>
-    <h1>Isha's Wunschliste</h1>
-    <div class="tagline">Space Party · 9. Geburtstag</div>
+    <div class="rocket-wrap" id="rocket">
+      <lottie-player
+        src="https://raw.githubusercontent.com/MohsinDev369/rocket-simple-animation/main/pages/data.json"
+        background="transparent"
+        speed="1"
+        autoplay></lottie-player>
+    </div>
+    <h1 data-i18n="h1">Isha's Wunschliste</h1>
+    <div class="tagline" data-i18n="tagline">Space Party · 9. Geburtstag</div>
     <div class="party-details">
-      <span>📅 9. Mai 2026</span>
-      <span>⏰ 15:00 – 19:00 Uhr</span>
+      <span data-i18n="date">📅 9. Mai 2026</span>
+      <span data-i18n="time">⏰ 15:00 – 19:00 Uhr</span>
       <span>📍 Ostendstraße 159, Nürnberg</span>
     </div>
   </header>
 
   <div class="divider">✦ ✦ ✦</div>
 
-  <div class="hint-box">
-    💡 Die Links zeigen ein <strong>Beispielprodukt zur Orientierung</strong> —
-    ihr könnt dasselbe oder ein ähnliches Geschenk überall kaufen, wo ihr möchtet
-    (Amazon, lokales Spielzeuggeschäft, etc.)
-  </div>
+  <div class="presence-banner" data-i18n="presenceBanner">💛 Deine Anwesenheit ist das schönste Geschenk! Mitbringen ist freiwillig.</div>
+
+  <div class="hint-box" data-i18n-html="hint"></div>
 
   <div class="legend">
-    <span><span class="dot dot-a"></span> Noch verfügbar</span>
-    <span><span class="dot dot-t"></span> Bereits vergeben</span>
+    <span><span class="dot dot-a"></span><span data-i18n="legendAvail">Noch verfügbar</span></span>
+    <span><span class="dot dot-t"></span><span data-i18n="legendTaken">Bereits vergeben</span></span>
   </div>
 
   <div class="admin-bar" id="adminBar">
     <span class="admin-label">⚡ Admin-Modus</span>
-    <button class="btn-add" onclick="openAdd()">+ Geschenk hinzufügen</button>
-    <button class="btn-logout" onclick="logout()">Abmelden</button>
+    <button class="btn-add" onclick="openAdd()" data-i18n="btnAdd">+ Geschenk hinzufügen</button>
+    <button class="btn-logout" onclick="logout()" data-i18n="btnLogout">Abmelden</button>
   </div>
 
   <div class="gift-grid" id="giftGrid">
-    <div style="grid-column:1/-1;text-align:center;padding:3rem;color:var(--text-muted);font-size:.9rem;">
+    <div style="grid-column:1/-1;text-align:center;padding:3rem;color:var(--text-muted);font-size:.9rem;" data-i18n="loading">
       🛸 Lade Wunschliste …
     </div>
   </div>
@@ -348,16 +406,16 @@
 <!-- Login modal -->
 <div class="overlay" id="loginOverlay">
   <div class="modal">
-    <h3>🛸 Mission Control</h3>
+    <h3 data-i18n="loginTitle">🛸 Mission Control</h3>
     <div class="field">
-      <label>Passwort</label>
-      <input type="password" id="pwInput" placeholder="Geheimes Passwort …"
+      <label data-i18n="loginLabel">Passwort</label>
+      <input type="password" id="pwInput" data-i18n-placeholder="loginPlaceholder" placeholder="Geheimes Passwort …"
              onkeydown="if(event.key==='Enter') doLogin()">
     </div>
     <div class="modal-err" id="loginErr"></div>
     <div class="modal-btns">
-      <button class="btn-no" onclick="closeLogin()">Abbrechen</button>
-      <button class="btn-ok" onclick="doLogin()">Einloggen</button>
+      <button class="btn-no" onclick="closeLogin()" data-i18n="btnCancel">Abbrechen</button>
+      <button class="btn-ok" onclick="doLogin()" data-i18n="btnLogin">Einloggen</button>
     </div>
   </div>
 </div>
@@ -365,39 +423,159 @@
 <!-- Add-gift modal -->
 <div class="overlay" id="addOverlay">
   <div class="modal">
-    <h3>🎁 Neues Geschenk</h3>
-    <div class="field"><label>Name des Geschenks *</label>
-      <input type="text" id="fName" placeholder="z.B. LEGO Weltraum-Set"></div>
-    <div class="field"><label>Emoji</label>
+    <h3 data-i18n="modalTitle">🎁 Neues Geschenk</h3>
+    <div class="field"><label data-i18n="labelName">Name des Geschenks *</label>
+      <input type="text" id="fName" data-i18n-placeholder="placeholderName" placeholder="z.B. LEGO Weltraum-Set"></div>
+    <div class="field"><label data-i18n="labelEmoji">Emoji</label>
       <input type="text" id="fEmoji" placeholder="🎁" maxlength="2"></div>
-    <div class="field"><label>Preis (ca.)</label>
-      <input type="text" id="fPrice" placeholder="z.B. €25 – 35"></div>
-    <div class="field"><label>Beschreibung (optional)</label>
-      <input type="text" id="fDesc" placeholder="z.B. Alter 7+, 500 Teile"></div>
-    <div class="field"><label>Beispiel-Link (URL)</label>
+    <div class="field"><label data-i18n="labelPrice">Preis (ca.)</label>
+      <input type="text" id="fPrice" data-i18n-placeholder="placeholderPrice" placeholder="z.B. €25 – 35"></div>
+    <div class="field"><label data-i18n="labelDesc">Beschreibung (optional)</label>
+      <input type="text" id="fDesc" data-i18n-placeholder="placeholderDesc" placeholder="z.B. Alter 7+, 500 Teile"></div>
+    <div class="field"><label data-i18n="labelUrl">Beispiel-Link (URL)</label>
       <input type="text" id="fUrl" placeholder="https://…"></div>
     <div class="modal-btns">
-      <button class="btn-no" onclick="closeAdd()">Abbrechen</button>
-      <button class="btn-ok" onclick="addGift()">Hinzufügen</button>
+      <button class="btn-no" onclick="closeAdd()" data-i18n="btnCancel">Abbrechen</button>
+      <button class="btn-ok" onclick="addGift()" data-i18n="btnSubmit">Hinzufügen</button>
     </div>
   </div>
 </div>
 
 <script>
+/* ─── Translations ─── */
+const T = {
+  de: {
+    title: "Isha's Space Party – Geschenkwünsche 🚀",
+    h1: "Isha's Wunschliste",
+    tagline: "Space Party · 9. Geburtstag",
+    date: "📅 9. Mai 2026",
+    time: "⏰ 15:00 – 19:00 Uhr",
+    presenceBanner: "💛 Deine Anwesenheit ist das schönste Geschenk! Mitbringen ist freiwillig.",
+    hint: "💡 Die Links zeigen ein <strong>Beispielprodukt zur Orientierung</strong> — ihr könnt dasselbe oder ein ähnliches Geschenk überall kaufen, wo ihr möchtet (Amazon, lokales Spielzeuggeschäft, etc.)",
+    legendAvail: "Noch verfügbar",
+    legendTaken: "Bereits vergeben",
+    btnAdd: "+ Geschenk hinzufügen",
+    loading: "🛸 Lade Wunschliste …",
+    badgeTaken: "✗ Vergeben",
+    badgeAvail: "✓ Verfügbar",
+    btnExample: "🔍 Beispiel ansehen",
+    refNote: "Ähnliches auch im lokalen Spielzeughandel erhältlich",
+    btnUnmark: "↩ Freigeben",
+    btnMark: "✓ Als vergeben",
+    modalTitle: "🎁 Neues Geschenk",
+    labelName: "Name des Geschenks *",
+    placeholderName: "z.B. LEGO Weltraum-Set",
+    labelEmoji: "Emoji",
+    labelPrice: "Preis (ca.)",
+    placeholderPrice: "z.B. €25 – 35",
+    labelDesc: "Beschreibung (optional)",
+    placeholderDesc: "z.B. Alter 7+, 500 Teile",
+    labelUrl: "Beispiel-Link (URL)",
+    btnCancel: "Abbrechen",
+    btnSubmit: "Hinzufügen",
+    toastLoadFail: "⚠️ Laden fehlgeschlagen – bitte Seite neu laden",
+    toastSaved: "✓ Gespeichert – alle sehen jetzt die Änderung",
+    toastSaveFail: "⚠️ Speichern fehlgeschlagen",
+    confirmDelete: "Dieses Geschenk wirklich löschen?",
+    loginTitle: "🛸 Mission Control",
+    loginLabel: "Passwort",
+    loginPlaceholder: "Geheimes Passwort …",
+    loginErr: "Falsches Passwort – nochmal versuchen!",
+    loginConnErr: "Verbindungsfehler – bitte erneut versuchen.",
+    btnLogin: "Einloggen",
+    btnLogout: "Abmelden",
+    toastLoggedIn: "✓ Als Admin eingeloggt",
+    toastLoggedOut: "Abgemeldet",
+    waTooltip: "Ich bringe das mit! – Nachricht an Mama senden",
+    badgeBringing: "✓ Wird mitgebracht"
+  },
+  en: {
+    title: "Isha's Space Party – Wish List 🚀",
+    h1: "Isha's Wish List",
+    tagline: "Space Party · 9th Birthday",
+    date: "📅 May 9, 2026",
+    time: "⏰ 3:00 PM – 7:00 PM",
+    presenceBanner: "💛 Your presence is the best gift! Bringing something is entirely optional.",
+    hint: "💡 The links show an <strong>example product for reference</strong> — you can buy the same or a similar gift anywhere you like (Amazon, local toy store, etc.)",
+    legendAvail: "Still available",
+    legendTaken: "Already claimed",
+    btnAdd: "+ Add gift",
+    loading: "🛸 Loading wish list …",
+    badgeTaken: "✗ Claimed",
+    badgeAvail: "✓ Available",
+    btnExample: "🔍 View example",
+    refNote: "Similar items also available at local toy stores",
+    btnUnmark: "↩ Unmark",
+    btnMark: "✓ Mark as claimed",
+    modalTitle: "🎁 New Gift",
+    labelName: "Gift name *",
+    placeholderName: "e.g. LEGO Space Set",
+    labelEmoji: "Emoji",
+    labelPrice: "Price (approx.)",
+    placeholderPrice: "e.g. €25 – 35",
+    labelDesc: "Description (optional)",
+    placeholderDesc: "e.g. Age 7+, 500 pieces",
+    labelUrl: "Example link (URL)",
+    btnCancel: "Cancel",
+    btnSubmit: "Add",
+    toastLoadFail: "⚠️ Failed to load – please reload",
+    toastSaved: "✓ Saved – everyone can now see the update",
+    toastSaveFail: "⚠️ Failed to save",
+    confirmDelete: "Really delete this gift?",
+    loginTitle: "🛸 Mission Control",
+    loginLabel: "Password",
+    loginPlaceholder: "Secret password …",
+    loginErr: "Wrong password – please try again!",
+    loginConnErr: "Connection error – please try again.",
+    btnLogin: "Log in",
+    btnLogout: "Log out",
+    toastLoggedIn: "✓ Logged in as admin",
+    toastLoggedOut: "Logged out",
+    waTooltip: "I'll bring this! – Send message to Mama",
+    badgeBringing: "✓ Being brought"
+  }
+};
+
 /* ─── State ─── */
+let lang = "de";
 let isAdmin = false;
-let gifts   = [];
-let adminPassword = "";   // entered at login, held in memory only
+let gifts = [];
+let adminPassword = "";
+
+/* ─── Language ─── */
+function setLang(newLang) {
+  lang = newLang;
+  document.documentElement.lang = lang;
+  document.title = T[lang].title;
+
+  document.querySelectorAll("[data-i18n]").forEach(el => {
+    el.textContent = T[lang][el.getAttribute("data-i18n")];
+  });
+
+  document.querySelectorAll("[data-i18n-html]").forEach(el => {
+    el.innerHTML = T[lang][el.getAttribute("data-i18n-html")];
+  });
+
+  document.querySelectorAll("[data-i18n-placeholder]").forEach(el => {
+    el.placeholder = T[lang][el.getAttribute("data-i18n-placeholder")];
+  });
+
+  document.querySelectorAll(".lang-btn").forEach(btn => {
+    btn.classList.toggle("active", btn.getAttribute("data-lang") === lang);
+  });
+
+  render();
+}
 
 /* ─── API helpers ─── */
 async function loadGifts() {
   setLoading(true);
   try {
-    const res  = await fetch("/api/get-gifts");
+    const res = await fetch("/api/get-gifts");
     const data = await res.json();
     gifts = data.gifts;
   } catch(e) {
-    showToast("⚠️ Laden fehlgeschlagen – bitte Seite neu laden");
+    showToast(T[lang].toastLoadFail);
   } finally {
     setLoading(false);
     render();
@@ -408,14 +586,14 @@ async function saveGifts() {
   setLoading(true);
   try {
     const res = await fetch("/api/update-gifts", {
-      method:  "POST",
+      method: "POST",
       headers: { "Content-Type": "application/json" },
-      body:    JSON.stringify({ password: adminPassword, gifts })
+      body: JSON.stringify({ password: adminPassword, gifts })
     });
     if (!res.ok) throw new Error(await res.text());
-    showToast("✓ Gespeichert – alle sehen jetzt die Änderung");
+    showToast(T[lang].toastSaved);
   } catch(e) {
-    showToast("⚠️ Speichern fehlgeschlagen");
+    showToast(T[lang].toastSaveFail);
   } finally {
     setLoading(false);
   }
@@ -429,6 +607,14 @@ function render() {
     const card = document.createElement("div");
     card.className = "gift-card" + (g.taken ? " taken" : "") + (isAdmin ? " admin-mode" : "");
     card.style.animationDelay = (i * 0.06) + "s";
+
+    const emojiPart = g.emoji ? ` ${g.emoji}` : "";
+    const waMsg = lang === "de"
+      ? `Hallo! Ich bringe Isha ein ${g.name}${emojiPart} zur Space Party am 9. Mai mit! 🚀`
+      : `Hello! I'll bring Isha a ${g.name}${emojiPart} to the Space Party on May 9! 🚀`;
+    const waUrl = `https://wa.me/919886388127?text=${encodeURIComponent(waMsg)}`;
+    const waIcon = `<svg viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>`;
+
     card.innerHTML = `
       <div class="card-top">
         <span class="gift-emoji">${g.emoji || "🎁"}</span>
@@ -438,17 +624,24 @@ function render() {
       <div class="card-badges">
         <span class="badge badge-price">💶 ${g.price}</span>
         <span class="badge ${g.taken ? "badge-taken" : "badge-available"}">
-          ${g.taken ? "✗ Vergeben" : "✓ Verfügbar"}
+          ${g.taken ? T[lang].badgeTaken : T[lang].badgeAvail}
         </span>
       </div>
       <div class="card-actions">
         <a class="btn-example ${g.taken ? "gone" : ""}"
            href="${g.url}" target="_blank" rel="noopener">
-          🔍 Beispiel ansehen
+          ${T[lang].btnExample}
         </a>
-        ${!g.taken ? `<span class="ref-note">Ähnliches auch im lokalen Spielzeughandel erhältlich</span>` : ""}
+        ${g.taken
+          ? `<span class="badge-bringing">${T[lang].badgeBringing}</span>`
+          : `<a class="btn-wa" href="${waUrl}" target="_blank" rel="noopener">
+               <span class="wa-tooltip">${T[lang].waTooltip}</span>
+               ${waIcon}
+             </a>`
+        }
+        ${!g.taken ? `<span class="ref-note">${T[lang].refNote}</span>` : ""}
         <button class="btn-admin ml" onclick="toggleTaken(${g.id})">
-          ${g.taken ? "↩ Freigeben" : "✓ Als vergeben"}
+          ${g.taken ? T[lang].btnUnmark : T[lang].btnMark}
         </button>
         <button class="btn-admin del" onclick="deleteGift(${g.id})">🗑</button>
       </div>
@@ -467,14 +660,14 @@ async function toggleTaken(id) {
 }
 
 async function deleteGift(id) {
-  if (!confirm("Dieses Geschenk wirklich löschen?")) return;
+  if (!confirm(T[lang].confirmDelete)) return;
   gifts = gifts.filter(x => x.id !== id);
   render();
   await saveGifts();
 }
 
 /* ─── Add gift ─── */
-function openAdd()  { document.getElementById("addOverlay").classList.add("open"); }
+function openAdd() { document.getElementById("addOverlay").classList.add("open"); }
 function closeAdd() {
   document.getElementById("addOverlay").classList.remove("open");
   ["fName","fEmoji","fPrice","fDesc","fUrl"].forEach(id => document.getElementById(id).value = "");
@@ -483,12 +676,12 @@ async function addGift() {
   const name = document.getElementById("fName").value.trim();
   if (!name) { document.getElementById("fName").focus(); return; }
   gifts.push({
-    id:    Date.now(),
+    id: Date.now(),
     emoji: document.getElementById("fEmoji").value.trim() || "🎁",
     name,
-    desc:  document.getElementById("fDesc").value.trim(),
+    desc: document.getElementById("fDesc").value.trim(),
     price: document.getElementById("fPrice").value.trim() || "—",
-    url:   document.getElementById("fUrl").value.trim()  || "#",
+    url: document.getElementById("fUrl").value.trim() || "#",
     taken: false
   });
   closeAdd();
@@ -514,32 +707,34 @@ async function doLogin() {
   setLoading(true);
   try {
     const res = await fetch("/api/update-gifts", {
-      method:  "POST",
+      method: "POST",
       headers: { "Content-Type": "application/json" },
-      body:    JSON.stringify({ password: pw, gifts })   // sends current gifts unchanged — just checks password
+      body: JSON.stringify({ password: pw, gifts })
     });
     if (res.ok) {
       adminPassword = pw;
       isAdmin = true;
       document.getElementById("adminBar").classList.add("visible");
       document.getElementById("lockFab").textContent = "🔓";
-      closeLogin(); render();
-      showToast("✓ Als Admin eingeloggt");
+      closeLogin();
+      render();
+      showToast(T[lang].toastLoggedIn);
     } else {
-      document.getElementById("loginErr").textContent = "Falsches Passwort – nochmal versuchen!";
+      document.getElementById("loginErr").textContent = T[lang].loginErr;
     }
   } catch {
-    document.getElementById("loginErr").textContent = "Verbindungsfehler – bitte erneut versuchen.";
+    document.getElementById("loginErr").textContent = T[lang].loginConnErr;
   } finally {
     setLoading(false);
   }
 }
 function logout() {
-  isAdmin = false; adminPassword = "";
+  isAdmin = false;
+  adminPassword = "";
   document.getElementById("adminBar").classList.remove("visible");
   document.getElementById("lockFab").textContent = "🔒";
   render();
-  showToast("Abgemeldet");
+  showToast(T[lang].toastLoggedOut);
 }
 
 /* ─── UI helpers ─── */
@@ -569,6 +764,7 @@ function showToast(msg) {
 })();
 
 /* ─── Init ─── */
+setLang('de');
 loadGifts();
 </script>
 </body>
