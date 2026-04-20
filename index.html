@@ -116,6 +116,14 @@
   }
   .hint-box strong { color:var(--cyan); }
 
+  /* ── Presence banner ── */
+  .presence-banner {
+    background:rgba(251,191,36,.08); border:1px solid rgba(251,191,36,.3);
+    border-radius:14px; padding:.85rem 1.1rem;
+    font-size:.86rem; color:#fde68a; line-height:1.55; text-align:center;
+    margin-bottom:1.4rem;
+  }
+
   /* ── Legend ── */
   .legend {
     display:flex; gap:1.2rem; justify-content:center; flex-wrap:wrap;
@@ -341,6 +349,8 @@
 
   <div class="divider">✦ ✦ ✦</div>
 
+  <div class="presence-banner" data-i18n="presenceBanner">💛 Deine Anwesenheit ist das schönste Geschenk! Mitbringen ist freiwillig.</div>
+
   <div class="hint-box" data-i18n-html="hint"></div>
 
   <div class="legend">
@@ -413,6 +423,7 @@ const T = {
     tagline: "Space Party · 9. Geburtstag",
     date: "📅 9. Mai 2026",
     time: "⏰ 15:00 – 19:00 Uhr",
+    presenceBanner: "💛 Deine Anwesenheit ist das schönste Geschenk! Mitbringen ist freiwillig.",
     hint: "💡 Die Links zeigen ein <strong>Beispielprodukt zur Orientierung</strong> — ihr könnt dasselbe oder ein ähnliches Geschenk überall kaufen, wo ihr möchtet (Amazon, lokales Spielzeuggeschäft, etc.)",
     legendAvail: "Noch verfügbar",
     legendTaken: "Bereits vergeben",
@@ -455,6 +466,7 @@ const T = {
     tagline: "Space Party · 9th Birthday",
     date: "📅 May 9, 2026",
     time: "⏰ 3:00 PM – 7:00 PM",
+    presenceBanner: "💛 Your presence is the best gift! Bringing something is entirely optional.",
     hint: "💡 The links show an <strong>example product for reference</strong> — you can buy the same or a similar gift anywhere you like (Amazon, local toy store, etc.)",
     legendAvail: "Still available",
     legendTaken: "Already claimed",
