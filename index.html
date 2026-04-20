@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Isha's Space Party – Geschenkwünsche 🚀</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --space-deep:   #05051a;
+    --purple:       #a855f7;
+    --purple-light: #c084fc;
+    --pink:         #e879f9;
+    --cyan:         #67e8f9;
+    --indigo:       #818cf8;
+    --green:        #4ade80;
+    --red:          #f87171;
+    --text:         #e2e8f0;
+    --text-muted:   #94a3b8;
+    --card-bg:      rgba(255,255,255,0.04);
+    --card-border:  rgba(168,85,247,0.25);
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    background: var(--space-deep);
+    font-family: 'Nunito', sans-serif;
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  #starfield {
+    position: fixed; inset: 0;
+    background: radial-gradient(ellipse at 15% 15%, #110a2e 0%, #05051a 55%, #0a0d2e 100%);
+    z-index: 0; pointer-events: none;
+  }
+  .star {
+    position: absolute; border-radius: 50%; background: #fff;
+    animation: twinkle var(--d,3s) ease-in-out infinite;
+    animation-delay: var(--delay,0s);
+  }
+  @keyframes twinkle {
+    0%,100% { opacity:.15; transform:scale(1); }
+    50%      { opacity:1;   transform:scale(1.5); }
+  }
+
+  .nebula { position:fixed; border-radius:50%; filter:blur(80px); pointer-events:none; z-index:0; }
+  .n1 { width:500px; height:500px; background:rgba(168,85,247,.07);  top:-150px; right:-150px; }
+  .n2 { width:400px; height:400px; background:rgba(103,232,249,.05); bottom:-100px; left:-100px; }
+  .n3 { width:300px; height:300px; background:rgba(232,121,249,.06); top:40%; left:30%; }
+
+  .container {
+    position:relative; z-index:1;
+    max-width:860px; margin:0 auto;
+    padding:2.5rem 1.5rem 5rem;
+  }
+
+  /* ── Header ── */
+  header { text-align:center; padding-bottom:2rem; }
+
+  .rocket-wrap {
+    display:inline-block; font-size:3.5rem; margin-bottom:.6rem;
+    animation:float 3.5s ease-in-out infinite;
+  }
+  @keyframes float {
+    0%,100% { transform:translateY(0) rotate(-5deg); }
+    50%      { transform:translateY(-14px) rotate(5deg); }
+  }
+
+  h1 {
+    font-family:'Orbitron',sans-serif;
+    font-size:clamp(1.6rem,5vw,2.6rem); font-weight:900;
+    letter-spacing:3px; text-transform:uppercase;
+    background:linear-gradient(135deg,#f0abfc,#818cf8 40%,#67e8f9);
+    -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+    margin-bottom:.35rem; line-height:1.15;
+  }
+
+  .tagline { font-size:.95rem; color:var(--indigo); font-weight:700; letter-spacing:2px; text-transform:uppercase; }
+
+  .party-details {
+    display:inline-flex; gap:1.5rem; flex-wrap:wrap; justify-content:center;
+    margin-top:1.1rem;
+    background:rgba(129,140,248,.08); border:1px solid rgba(129,140,248,.2);
+    border-radius:50px; padding:.55rem 1.4rem;
+    font-size:.82rem; color:var(--text-muted); font-weight:600;
+  }
+  .party-details span { display:flex; align-items:center; gap:5px; }
+
+  .divider { text-align:center; margin:1.2rem 0; color:var(--purple-light); letter-spacing:10px; font-size:1rem; opacity:.5; }
+
+  /* ── Hint box ── */
+  .hint-box {
+    background:rgba(103,232,249,.06); border:1px solid rgba(103,232,249,.2);
+    border-radius:14px; padding:.85rem 1.1rem;
+    font-size:.83rem; color:#a5f3fc; line-height:1.55; text-align:center;
+    margin-bottom:1.4rem;
+  }
+  .hint-box strong { color:var(--cyan); }
+
+  /* ── Legend ── */
+  .legend {
+    display:flex; gap:1.2rem; justify-content:center; flex-wrap:wrap;
+    margin-bottom:1.6rem; font-size:.8rem; color:var(--text-muted); font-weight:600;
+  }
+  .legend span { display:flex; align-items:center; gap:6px; }
+  .dot { width:9px; height:9px; border-radius:50%; display:inline-block; flex-shrink:0; }
+  .dot-a { background:var(--green); box-shadow:0 0 6px var(--green); }
+  .dot-t { background:var(--red);   box-shadow:0 0 6px var(--red); }
+
+  /* ── Status toast ── */
+  .toast {
+    position:fixed; bottom:5rem; left:50%; transform:translateX(-50%) translateY(20px);
+    background:rgba(15,15,58,.95); border:1px solid rgba(168,85,247,.4);
+    border-radius:12px; padding:.6rem 1.4rem;
+    font-size:.82rem; font-weight:700; color:#c4b5fd;
+    opacity:0; pointer-events:none; z-index:500;
+    transition:opacity .3s, transform .3s;
+    white-space:nowrap;
+  }
+  .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+
+  /* ── Loading overlay ── */
+  .loading-bar {
+    position:fixed; top:0; left:0; right:0; height:3px; z-index:600;
+    background:linear-gradient(90deg,var(--pink),var(--indigo),var(--cyan));
+    transform:scaleX(0); transform-origin:left;
+    transition:transform .4s ease; border-radius:0 2px 2px 0;
+  }
+  .loading-bar.active { transform:scaleX(1); }
+
+  /* ── Admin bar ── */
+  .admin-bar {
+    display:none; align-items:center; gap:10px; flex-wrap:wrap;
+    background:rgba(232,121,249,.07); border:1px solid rgba(232,121,249,.25);
+    border-radius:12px; padding:.75rem 1rem; margin-bottom:1.4rem;
+  }
+  .admin-bar.visible { display:flex; }
+  .admin-label { font-family:'Orbitron',sans-serif; font-size:.7rem; color:var(--pink); font-weight:700; letter-spacing:2px; }
+
+  .btn-add {
+    background:linear-gradient(135deg,var(--pink),var(--indigo));
+    border:none; color:#fff; border-radius:8px;
+    padding:6px 18px; font-size:.83rem; font-weight:800;
+    cursor:pointer; font-family:'Nunito',sans-serif; transition:opacity .2s,transform .15s;
+  }
+  .btn-add:hover { opacity:.85; transform:scale(1.03); }
+
+  .btn-logout {
+    margin-left:auto; background:transparent;
+    border:1px solid rgba(232,121,249,.35); color:var(--pink);
+    border-radius:8px; padding:6px 14px; font-size:.8rem; font-weight:700;
+    cursor:pointer; font-family:'Nunito',sans-serif; transition:background .2s;
+  }
+  .btn-logout:hover { background:rgba(232,121,249,.1); }
+
+  /* ── Gift grid ── */
+  .gift-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(360px,1fr)); gap:1rem; }
+
+  /* ── Gift card ── */
+  .gift-card {
+    background:var(--card-bg); border:1px solid var(--card-border);
+    border-radius:18px; padding:1.2rem 1.3rem;
+    position:relative; overflow:hidden;
+    transition:border-color .3s,transform .25s,background .3s;
+    animation:cardIn .4s ease both;
+  }
+  @keyframes cardIn { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+
+  .gift-card::before {
+    content:''; position:absolute; top:0; left:0; right:0; height:2px;
+    background:linear-gradient(90deg,var(--pink),var(--indigo),var(--cyan));
+    opacity:0; transition:opacity .3s;
+  }
+  .gift-card:hover { border-color:rgba(168,85,247,.6); transform:translateY(-3px); }
+  .gift-card:hover::before { opacity:1; }
+
+  .gift-card.taken { background:rgba(248,113,113,.04); border-color:rgba(248,113,113,.2); }
+  .gift-card.taken::before { background:linear-gradient(90deg,var(--red),#fb923c); opacity:1; }
+
+  .card-top { display:flex; align-items:flex-start; gap:12px; margin-bottom:.55rem; }
+  .gift-emoji { font-size:1.7rem; line-height:1; flex-shrink:0; margin-top:1px; }
+
+  .gift-name { font-size:1rem; font-weight:800; color:var(--text); line-height:1.3; transition:color .3s; }
+  .gift-card.taken .gift-name {
+    text-decoration:line-through; text-decoration-color:var(--red);
+    text-decoration-thickness:2px; color:var(--text-muted);
+  }
+
+  .gift-desc { font-size:.78rem; color:var(--text-muted); padding-left:2.1rem; margin-bottom:.6rem; line-height:1.45; }
+
+  .card-badges { padding-left:2.1rem; margin-bottom:.8rem; }
+  .badge {
+    display:inline-flex; align-items:center; gap:4px;
+    border-radius:20px; padding:3px 11px;
+    font-size:.73rem; font-weight:700; margin-right:6px;
+  }
+  .badge-price     { background:rgba(129,140,248,.12); border:1px solid rgba(129,140,248,.3); color:var(--indigo); }
+  .badge-available { background:rgba(74,222,128,.1);   border:1px solid rgba(74,222,128,.3);  color:var(--green); }
+  .badge-taken     { background:rgba(248,113,113,.1);  border:1px solid rgba(248,113,113,.3); color:var(--red); }
+
+  .card-actions {
+    display:flex; align-items:center; gap:8px; flex-wrap:wrap;
+    padding-top:.7rem; border-top:1px solid rgba(255,255,255,.06);
+  }
+
+  .btn-example {
+    display:inline-flex; align-items:center; gap:6px;
+    background:rgba(103,232,249,.08); border:1px solid rgba(103,232,249,.3);
+    color:var(--cyan); border-radius:9px; padding:6px 15px;
+    font-size:.79rem; font-weight:700; cursor:pointer;
+    text-decoration:none; font-family:'Nunito',sans-serif; transition:all .2s;
+  }
+  .btn-example:hover { background:rgba(103,232,249,.18); border-color:var(--cyan); color:#fff; transform:scale(1.04); }
+  .btn-example.gone  { opacity:.3; pointer-events:none; }
+
+  .ref-note { font-size:.7rem; color:#475569; font-style:italic; flex-basis:100%; margin-top:2px; }
+
+  .btn-admin {
+    display:none; background:transparent;
+    border:1px solid rgba(255,255,255,.1); color:var(--text-muted);
+    border-radius:8px; padding:5px 11px; font-size:.75rem; font-weight:700;
+    cursor:pointer; font-family:'Nunito',sans-serif; transition:all .2s;
+    align-items:center; gap:4px;
+  }
+  .admin-mode .btn-admin { display:inline-flex; }
+  .btn-admin:hover { color:var(--pink); border-color:var(--pink); }
+  .btn-admin.del { margin-left:4px; }
+  .btn-admin.del:hover { color:var(--red); border-color:var(--red); }
+  .btn-admin.ml { margin-left:auto; }
+
+  /* ── Lock FAB ── */
+  .lock-fab {
+    position:fixed; bottom:1.8rem; right:1.8rem; z-index:100;
+    width:50px; height:50px; border-radius:50%;
+    background:rgba(5,5,26,.92); border:1px solid rgba(168,85,247,.45);
+    color:#a78bfa; font-size:1.2rem;
+    display:flex; align-items:center; justify-content:center;
+    cursor:pointer; backdrop-filter:blur(6px);
+    transition:all .25s; box-shadow:0 0 20px rgba(168,85,247,.15);
+  }
+  .lock-fab:hover { border-color:var(--pink); color:var(--pink); box-shadow:0 0 28px rgba(232,121,249,.3); transform:scale(1.1); }
+
+  /* ── Modals ── */
+  .overlay {
+    position:fixed; inset:0; background:rgba(0,0,0,.75); backdrop-filter:blur(6px);
+    display:flex; align-items:center; justify-content:center;
+    z-index:300; opacity:0; pointer-events:none; transition:opacity .25s;
+  }
+  .overlay.open { opacity:1; pointer-events:all; }
+
+  .modal {
+    background:linear-gradient(145deg,#0e0e38,#08082a);
+    border:1px solid rgba(168,85,247,.35); border-radius:22px;
+    padding:2rem 1.8rem; width:92%; max-width:430px;
+    transform:scale(.9); transition:transform .25s;
+    box-shadow:0 0 60px rgba(168,85,247,.15);
+  }
+  .overlay.open .modal { transform:scale(1); }
+
+  .modal h3 { font-family:'Orbitron',sans-serif; font-size:.95rem; color:var(--pink); text-align:center; margin-bottom:1.4rem; letter-spacing:1px; }
+
+  .field { margin-bottom:1rem; }
+  .field label { display:block; font-size:.8rem; color:var(--text-muted); margin-bottom:5px; font-weight:700; }
+  .field input {
+    width:100%; background:rgba(255,255,255,.06);
+    border:1px solid rgba(168,85,247,.25); border-radius:9px;
+    color:var(--text); padding:9px 13px; font-size:.88rem;
+    font-family:'Nunito',sans-serif; outline:none; transition:border-color .2s;
+  }
+  .field input:focus { border-color:var(--pink); }
+  .field input::placeholder { color:#374151; }
+
+  .modal-err { color:var(--red); font-size:.78rem; text-align:center; min-height:1.1rem; margin-bottom:.4rem; }
+
+  .modal-btns { display:flex; gap:10px; margin-top:.4rem; }
+  .modal-btns button {
+    flex:1; padding:10px; border-radius:9px; font-size:.88rem; font-weight:800;
+    cursor:pointer; font-family:'Nunito',sans-serif; transition:opacity .2s,transform .15s;
+  }
+  .modal-btns button:hover { opacity:.85; transform:scale(1.02); }
+  .btn-ok { background:linear-gradient(135deg,var(--pink),var(--indigo)); border:none; color:#fff; }
+  .btn-no { background:transparent; border:1px solid rgba(255,255,255,.15); color:var(--text-muted); }
+
+  footer { text-align:center; margin-top:3.5rem; font-size:.75rem; color:#1e293b; letter-spacing:1.5px; text-transform:uppercase; }
+
+  @media(max-width:520px) {
+    .gift-grid { grid-template-columns:1fr; }
+    h1 { font-size:1.5rem; }
+    .party-details { gap:.8rem; font-size:.77rem; }
+  }
+</style>
+</head>
+<body>
+
+<div class="loading-bar" id="loadingBar"></div>
+<div id="starfield"></div>
+<div class="nebula n1"></div>
+<div class="nebula n2"></div>
+<div class="nebula n3"></div>
+<div class="toast" id="toast"></div>
+
+<div class="container">
+  <header>
+    <div class="rocket-wrap">🚀</div>
+    <h1>Isha's Wunschliste</h1>
+    <div class="tagline">Space Party · 9. Geburtstag</div>
+    <div class="party-details">
+      <span>📅 9. Mai 2026</span>
+      <span>⏰ 15:00 – 19:00 Uhr</span>
+      <span>📍 Ostendstraße 159, Nürnberg</span>
+    </div>
+  </header>
+
+  <div class="divider">✦ ✦ ✦</div>
+
+  <div class="hint-box">
+    💡 Die Links zeigen ein <strong>Beispielprodukt zur Orientierung</strong> —
+    ihr könnt dasselbe oder ein ähnliches Geschenk überall kaufen, wo ihr möchtet
+    (Amazon, lokales Spielzeuggeschäft, etc.)
+  </div>
+
+  <div class="legend">
+    <span><span class="dot dot-a"></span> Noch verfügbar</span>
+    <span><span class="dot dot-t"></span> Bereits vergeben</span>
+  </div>
+
+  <div class="admin-bar" id="adminBar">
+    <span class="admin-label">⚡ Admin-Modus</span>
+    <button class="btn-add" onclick="openAdd()">+ Geschenk hinzufügen</button>
+    <button class="btn-logout" onclick="logout()">Abmelden</button>
+  </div>
+
+  <div class="gift-grid" id="giftGrid">
+    <div style="grid-column:1/-1;text-align:center;padding:3rem;color:var(--text-muted);font-size:.9rem;">
+      🛸 Lade Wunschliste …
+    </div>
+  </div>
+
+  <footer>Isha's Space Party 2026 · Nürnberg</footer>
+</div>
+
+<!-- Lock FAB -->
+<button class="lock-fab" id="lockFab" onclick="fabClick()" title="Admin-Login">🔒</button>
+
+<!-- Login modal -->
+<div class="overlay" id="loginOverlay">
+  <div class="modal">
+    <h3>🛸 Mission Control</h3>
+    <div class="field">
+      <label>Passwort</label>
+      <input type="password" id="pwInput" placeholder="Geheimes Passwort …"
+             onkeydown="if(event.key==='Enter') doLogin()">
+    </div>
+    <div class="modal-err" id="loginErr"></div>
+    <div class="modal-btns">
+      <button class="btn-no" onclick="closeLogin()">Abbrechen</button>
+      <button class="btn-ok" onclick="doLogin()">Einloggen</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add-gift modal -->
+<div class="overlay" id="addOverlay">
+  <div class="modal">
+    <h3>🎁 Neues Geschenk</h3>
+    <div class="field"><label>Name des Geschenks *</label>
+      <input type="text" id="fName" placeholder="z.B. LEGO Weltraum-Set"></div>
+    <div class="field"><label>Emoji</label>
+      <input type="text" id="fEmoji" placeholder="🎁" maxlength="2"></div>
+    <div class="field"><label>Preis (ca.)</label>
+      <input type="text" id="fPrice" placeholder="z.B. €25 – 35"></div>
+    <div class="field"><label>Beschreibung (optional)</label>
+      <input type="text" id="fDesc" placeholder="z.B. Alter 7+, 500 Teile"></div>
+    <div class="field"><label>Beispiel-Link (URL)</label>
+      <input type="text" id="fUrl" placeholder="https://…"></div>
+    <div class="modal-btns">
+      <button class="btn-no" onclick="closeAdd()">Abbrechen</button>
+      <button class="btn-ok" onclick="addGift()">Hinzufügen</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ─── State ─── */
+let isAdmin = false;
+let gifts   = [];
+let adminPassword = "";   // entered at login, held in memory only
+
+/* ─── API helpers ─── */
+async function loadGifts() {
+  setLoading(true);
+  try {
+    const res  = await fetch("/api/get-gifts");
+    const data = await res.json();
+    gifts = data.gifts;
+  } catch(e) {
+    showToast("⚠️ Laden fehlgeschlagen – bitte Seite neu laden");
+  } finally {
+    setLoading(false);
+    render();
+  }
+}
+
+async function saveGifts() {
+  setLoading(true);
+  try {
+    const res = await fetch("/api/update-gifts", {
+      method:  "POST",
+      headers: { "Content-Type": "application/json" },
+      body:    JSON.stringify({ password: adminPassword, gifts })
+    });
+    if (!res.ok) throw new Error(await res.text());
+    showToast("✓ Gespeichert – alle sehen jetzt die Änderung");
+  } catch(e) {
+    showToast("⚠️ Speichern fehlgeschlagen");
+  } finally {
+    setLoading(false);
+  }
+}
+
+/* ─── Render ─── */
+function render() {
+  const grid = document.getElementById("giftGrid");
+  grid.innerHTML = "";
+  gifts.forEach((g, i) => {
+    const card = document.createElement("div");
+    card.className = "gift-card" + (g.taken ? " taken" : "") + (isAdmin ? " admin-mode" : "");
+    card.style.animationDelay = (i * 0.06) + "s";
+    card.innerHTML = `
+      <div class="card-top">
+        <span class="gift-emoji">${g.emoji || "🎁"}</span>
+        <span class="gift-name">${g.name}</span>
+      </div>
+      ${g.desc ? `<div class="gift-desc">${g.desc}</div>` : ""}
+      <div class="card-badges">
+        <span class="badge badge-price">💶 ${g.price}</span>
+        <span class="badge ${g.taken ? "badge-taken" : "badge-available"}">
+          ${g.taken ? "✗ Vergeben" : "✓ Verfügbar"}
+        </span>
+      </div>
+      <div class="card-actions">
+        <a class="btn-example ${g.taken ? "gone" : ""}"
+           href="${g.url}" target="_blank" rel="noopener">
+          🔍 Beispiel ansehen
+        </a>
+        ${!g.taken ? `<span class="ref-note">Ähnliches auch im lokalen Spielzeughandel erhältlich</span>` : ""}
+        <button class="btn-admin ml" onclick="toggleTaken(${g.id})">
+          ${g.taken ? "↩ Freigeben" : "✓ Als vergeben"}
+        </button>
+        <button class="btn-admin del" onclick="deleteGift(${g.id})">🗑</button>
+      </div>
+    `;
+    grid.appendChild(card);
+  });
+}
+
+/* ─── Admin actions ─── */
+async function toggleTaken(id) {
+  const g = gifts.find(x => x.id === id);
+  if (!g) return;
+  g.taken = !g.taken;
+  render();
+  await saveGifts();
+}
+
+async function deleteGift(id) {
+  if (!confirm("Dieses Geschenk wirklich löschen?")) return;
+  gifts = gifts.filter(x => x.id !== id);
+  render();
+  await saveGifts();
+}
+
+/* ─── Add gift ─── */
+function openAdd()  { document.getElementById("addOverlay").classList.add("open"); }
+function closeAdd() {
+  document.getElementById("addOverlay").classList.remove("open");
+  ["fName","fEmoji","fPrice","fDesc","fUrl"].forEach(id => document.getElementById(id).value = "");
+}
+async function addGift() {
+  const name = document.getElementById("fName").value.trim();
+  if (!name) { document.getElementById("fName").focus(); return; }
+  gifts.push({
+    id:    Date.now(),
+    emoji: document.getElementById("fEmoji").value.trim() || "🎁",
+    name,
+    desc:  document.getElementById("fDesc").value.trim(),
+    price: document.getElementById("fPrice").value.trim() || "—",
+    url:   document.getElementById("fUrl").value.trim()  || "#",
+    taken: false
+  });
+  closeAdd();
+  render();
+  await saveGifts();
+}
+
+/* ─── Login / logout ─── */
+function fabClick() {
+  if (isAdmin) logout();
+  else {
+    document.getElementById("loginOverlay").classList.add("open");
+    setTimeout(() => document.getElementById("pwInput").focus(), 120);
+  }
+}
+function closeLogin() {
+  document.getElementById("loginOverlay").classList.remove("open");
+  document.getElementById("pwInput").value = "";
+  document.getElementById("loginErr").textContent = "";
+}
+async function doLogin() {
+  const pw = document.getElementById("pwInput").value;
+  setLoading(true);
+  try {
+    const res = await fetch("/api/update-gifts", {
+      method:  "POST",
+      headers: { "Content-Type": "application/json" },
+      body:    JSON.stringify({ password: pw, gifts })   // sends current gifts unchanged — just checks password
+    });
+    if (res.ok) {
+      adminPassword = pw;
+      isAdmin = true;
+      document.getElementById("adminBar").classList.add("visible");
+      document.getElementById("lockFab").textContent = "🔓";
+      closeLogin(); render();
+      showToast("✓ Als Admin eingeloggt");
+    } else {
+      document.getElementById("loginErr").textContent = "Falsches Passwort – nochmal versuchen!";
+    }
+  } catch {
+    document.getElementById("loginErr").textContent = "Verbindungsfehler – bitte erneut versuchen.";
+  } finally {
+    setLoading(false);
+  }
+}
+function logout() {
+  isAdmin = false; adminPassword = "";
+  document.getElementById("adminBar").classList.remove("visible");
+  document.getElementById("lockFab").textContent = "🔒";
+  render();
+  showToast("Abgemeldet");
+}
+
+/* ─── UI helpers ─── */
+function setLoading(on) {
+  document.getElementById("loadingBar").classList.toggle("active", on);
+}
+
+let toastTimer;
+function showToast(msg) {
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove("show"), 3000);
+}
+
+/* ─── Stars ─── */
+(function() {
+  const sf = document.getElementById("starfield");
+  for (let i = 0; i < 120; i++) {
+    const s = document.createElement("div");
+    s.className = "star";
+    const sz = Math.random() * 2.2 + 0.4;
+    s.style.cssText = `width:${sz}px;height:${sz}px;top:${Math.random()*100}%;left:${Math.random()*100}%;--d:${(2+Math.random()*5).toFixed(1)}s;--delay:${(Math.random()*5).toFixed(1)}s`;
+    sf.appendChild(s);
+  }
+})();
+
+/* ─── Init ─── */
+loadGifts();
+</script>
+</body>
+</html>
