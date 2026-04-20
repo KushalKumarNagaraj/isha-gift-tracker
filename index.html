@@ -133,12 +133,10 @@
 
   /* ── Admin bar ── */
   .admin-bar {
-    display:none; align-items:center; gap:10px; flex-wrap:wrap;
+    display:flex; align-items:center; gap:10px; flex-wrap:wrap;
     background:rgba(232,121,249,.07); border:1px solid rgba(232,121,249,.25);
     border-radius:12px; padding:.75rem 1rem; margin-bottom:1.4rem;
   }
-  .admin-bar.visible { display:flex; }
-  .admin-label { font-family:'Orbitron',sans-serif; font-size:.7rem; color:var(--pink); font-weight:700; letter-spacing:2px; }
 
   .btn-add {
     background:linear-gradient(135deg,var(--pink),var(--indigo));
@@ -148,13 +146,6 @@
   }
   .btn-add:hover { opacity:.85; transform:scale(1.03); }
 
-  .btn-logout {
-    margin-left:auto; background:transparent;
-    border:1px solid rgba(232,121,249,.35); color:var(--pink);
-    border-radius:8px; padding:6px 14px; font-size:.8rem; font-weight:700;
-    cursor:pointer; font-family:'Nunito',sans-serif; transition:background .2s;
-  }
-  .btn-logout:hover { background:rgba(232,121,249,.1); }
 
   /* ── Gift grid ── */
   .gift-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(360px,1fr)); gap:1rem; }
@@ -231,17 +222,6 @@
   .btn-admin.del:hover { color:var(--red); border-color:var(--red); }
   .btn-admin.ml { margin-left:auto; }
 
-  /* ── Lock FAB ── */
-  .lock-fab {
-    position:fixed; bottom:1.8rem; right:1.8rem; z-index:100;
-    width:50px; height:50px; border-radius:50%;
-    background:rgba(5,5,26,.92); border:1px solid rgba(168,85,247,.45);
-    color:#a78bfa; font-size:1.2rem;
-    display:flex; align-items:center; justify-content:center;
-    cursor:pointer; backdrop-filter:blur(6px);
-    transition:all .25s; box-shadow:0 0 20px rgba(168,85,247,.15);
-  }
-  .lock-fab:hover { border-color:var(--pink); color:var(--pink); box-shadow:0 0 28px rgba(232,121,249,.3); transform:scale(1.1); }
 
   /* ── Modals ── */
   .overlay {
@@ -327,10 +307,8 @@
     <span><span class="dot dot-t"></span> Bereits vergeben</span>
   </div>
 
-  <div class="admin-bar" id="adminBar">
-    <span class="admin-label">⚡ Admin-Modus</span>
+  <div class="admin-bar">
     <button class="btn-add" onclick="openAdd()">+ Geschenk hinzufügen</button>
-    <button class="btn-logout" onclick="logout()">Abmelden</button>
   </div>
 
   <div class="gift-grid" id="giftGrid">
@@ -340,26 +318,6 @@
   </div>
 
   <footer>Isha's Space Party 2026 · Nürnberg</footer>
-</div>
-
-<!-- Lock FAB -->
-<button class="lock-fab" id="lockFab" onclick="fabClick()" title="Admin-Login">🔒</button>
-
-<!-- Login modal -->
-<div class="overlay" id="loginOverlay">
-  <div class="modal">
-    <h3>🛸 Mission Control</h3>
-    <div class="field">
-      <label>Passwort</label>
-      <input type="password" id="pwInput" placeholder="Geheimes Passwort …"
-             onkeydown="if(event.key==='Enter') doLogin()">
-    </div>
-    <div class="modal-err" id="loginErr"></div>
-    <div class="modal-btns">
-      <button class="btn-no" onclick="closeLogin()">Abbrechen</button>
-      <button class="btn-ok" onclick="doLogin()">Einloggen</button>
-    </div>
-  </div>
 </div>
 
 <!-- Add-gift modal -->
@@ -385,9 +343,7 @@
 
 <script>
 /* ─── State ─── */
-let isAdmin = false;
-let gifts   = [];
-let adminPassword = "";   // entered at login, held in memory only
+let gifts = [];
 
 /* ─── API helpers ─── */
 async function loadGifts() {
@@ -410,7 +366,7 @@ async function saveGifts() {
     const res = await fetch("/api/update-gifts", {
       method:  "POST",
       headers: { "Content-Type": "application/json" },
-      body:    JSON.stringify({ password: adminPassword, gifts })
+      body:    JSON.stringify({ gifts })
     });
     if (!res.ok) throw new Error(await res.text());
     showToast("✓ Gespeichert – alle sehen jetzt die Änderung");
@@ -427,7 +383,7 @@ function render() {
   grid.innerHTML = "";
   gifts.forEach((g, i) => {
     const card = document.createElement("div");
-    card.className = "gift-card" + (g.taken ? " taken" : "") + (isAdmin ? " admin-mode" : "");
+    card.className = "gift-card" + (g.taken ? " taken" : "") + " admin-mode";
     card.style.animationDelay = (i * 0.06) + "s";
     card.innerHTML = `
       <div class="card-top">
@@ -496,51 +452,6 @@ async function addGift() {
   await saveGifts();
 }
 
-/* ─── Login / logout ─── */
-function fabClick() {
-  if (isAdmin) logout();
-  else {
-    document.getElementById("loginOverlay").classList.add("open");
-    setTimeout(() => document.getElementById("pwInput").focus(), 120);
-  }
-}
-function closeLogin() {
-  document.getElementById("loginOverlay").classList.remove("open");
-  document.getElementById("pwInput").value = "";
-  document.getElementById("loginErr").textContent = "";
-}
-async function doLogin() {
-  const pw = document.getElementById("pwInput").value;
-  setLoading(true);
-  try {
-    const res = await fetch("/api/update-gifts", {
-      method:  "POST",
-      headers: { "Content-Type": "application/json" },
-      body:    JSON.stringify({ password: pw, gifts })   // sends current gifts unchanged — just checks password
-    });
-    if (res.ok) {
-      adminPassword = pw;
-      isAdmin = true;
-      document.getElementById("adminBar").classList.add("visible");
-      document.getElementById("lockFab").textContent = "🔓";
-      closeLogin(); render();
-      showToast("✓ Als Admin eingeloggt");
-    } else {
-      document.getElementById("loginErr").textContent = "Falsches Passwort – nochmal versuchen!";
-    }
-  } catch {
-    document.getElementById("loginErr").textContent = "Verbindungsfehler – bitte erneut versuchen.";
-  } finally {
-    setLoading(false);
-  }
-}
-function logout() {
-  isAdmin = false; adminPassword = "";
-  document.getElementById("adminBar").classList.remove("visible");
-  document.getElementById("lockFab").textContent = "🔒";
-  render();
-  showToast("Abgemeldet");
-}
 
 /* ─── UI helpers ─── */
 function setLoading(on) {
