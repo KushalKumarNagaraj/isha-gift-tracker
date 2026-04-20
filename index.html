@@ -79,10 +79,21 @@
   .rocket-wrap {
     display:inline-block; font-size:3.5rem; margin-bottom:.6rem;
     animation:float 3.5s ease-in-out infinite;
+    cursor:pointer; user-select:none;
   }
   @keyframes float {
     0%,100% { transform:translateY(0) rotate(-5deg); }
     50%      { transform:translateY(-14px) rotate(5deg); }
+  }
+  @keyframes joyride {
+    0%   { transform:translate(0,0)          rotate(0deg)   scale(1);    opacity:1; }
+    12%  { transform:translate(32vw,-20vh)   rotate(55deg)  scale(1.7);  opacity:1; }
+    28%  { transform:translate(38vw, 15vh)   rotate(110deg) scale(1.55); opacity:1; }
+    46%  { transform:translate(20vw,  65vh)  rotate(165deg) scale(1.4);  opacity:1; }
+    62%  { transform:translate(-35vw, 60vh)  rotate(220deg) scale(1.35); opacity:1; }
+    76%  { transform:translate(-38vw,-15vh)  rotate(295deg) scale(1.2);  opacity:1; }
+    90%  { transform:translate(-5vw, -8vh)   rotate(345deg) scale(1.05); opacity:1; }
+    100% { transform:translate(0,0)          rotate(360deg) scale(1);    opacity:1; }
   }
 
   h1 {
@@ -359,7 +370,7 @@
 
 <div class="container">
   <header>
-    <div class="rocket-wrap">🚀</div>
+    <div class="rocket-wrap" id="rocket" onclick="launchRocket()">🚀</div>
     <h1 data-i18n="h1">Isha's Wunschliste</h1>
     <div class="tagline" data-i18n="tagline">Space Party · 9. Geburtstag</div>
     <div class="party-details">
@@ -744,6 +755,31 @@ function showToast(msg) {
   t.classList.add("show");
   clearTimeout(toastTimer);
   toastTimer = setTimeout(() => t.classList.remove("show"), 3000);
+}
+
+/* ─── Rocket joyride ─── */
+function launchRocket() {
+  const wrap = document.getElementById('rocket');
+  if (document.getElementById('rocket-joyride')) return;
+
+  const rect = wrap.getBoundingClientRect();
+  const clone = document.createElement('span');
+  clone.id = 'rocket-joyride';
+  clone.textContent = '🚀';
+  clone.style.cssText = `
+    position:fixed; z-index:9999; pointer-events:none;
+    left:${rect.left}px; top:${rect.top}px;
+    width:${rect.width}px; height:${rect.height}px;
+    font-size:3.5rem; line-height:1;
+    display:flex; align-items:center; justify-content:center;
+    animation:joyride 2.6s cubic-bezier(.4,0,.2,1) forwards;
+  `;
+  wrap.style.opacity = '0';
+  document.body.appendChild(clone);
+  clone.addEventListener('animationend', () => {
+    clone.remove();
+    wrap.style.opacity = '';
+  }, { once: true });
 }
 
 /* ─── Stars ─── */
