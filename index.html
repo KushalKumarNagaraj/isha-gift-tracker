@@ -79,10 +79,21 @@
   .rocket-wrap {
     display:inline-block; font-size:3.5rem; margin-bottom:.6rem;
     animation:float 3.5s ease-in-out infinite;
+    cursor:pointer; user-select:none;
   }
   @keyframes float {
     0%,100% { transform:translateY(0) rotate(-5deg); }
     50%      { transform:translateY(-14px) rotate(5deg); }
+  }
+  .rocket-wrap.launching {
+    animation:launch 1s cubic-bezier(.4,0,.2,1) forwards;
+  }
+  @keyframes launch {
+    0%   { transform:translateY(0)     rotate(0deg)   scale(1);   opacity:1; }
+    60%  { transform:translateY(-120px) rotate(15deg)  scale(1.3); opacity:1; }
+    80%  { transform:translateY(-220px) rotate(20deg)  scale(.9);  opacity:0; }
+    81%  { transform:translateY(60px)  rotate(-10deg) scale(.6);  opacity:0; }
+    100% { transform:translateY(0)     rotate(-5deg)  scale(1);   opacity:1; }
   }
 
   h1 {
@@ -359,7 +370,7 @@
 
 <div class="container">
   <header>
-    <div class="rocket-wrap">🚀</div>
+    <div class="rocket-wrap" id="rocket" onclick="launchRocket()">🚀</div>
     <h1 data-i18n="h1">Isha's Wunschliste</h1>
     <div class="tagline" data-i18n="tagline">Space Party · 9. Geburtstag</div>
     <div class="party-details">
@@ -744,6 +755,16 @@ function showToast(msg) {
   t.classList.add("show");
   clearTimeout(toastTimer);
   toastTimer = setTimeout(() => t.classList.remove("show"), 3000);
+}
+
+/* ─── Rocket launch ─── */
+function launchRocket() {
+  const el = document.getElementById("rocket");
+  if (el.classList.contains("launching")) return;
+  el.classList.add("launching");
+  el.addEventListener("animationend", () => {
+    el.classList.remove("launching");
+  }, { once: true });
 }
 
 /* ─── Stars ─── */
