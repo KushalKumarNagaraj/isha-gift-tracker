@@ -813,6 +813,13 @@ function launchRocket() {
 /* ─── Init ─── */
 setLang('de');
 loadGifts();
+
+/* Auto-fly once on load after Lottie is ready */
+(function() {
+  const player = document.querySelector('#rocket lottie-player');
+  if (!player) return;
+  player.addEventListener('ready', () => setTimeout(launchRocket, 400), { once: true });
+})();
 </script>
 </body>
 </html>
