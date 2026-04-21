@@ -9,6 +9,8 @@ const DEFAULT_GIFTS = [
   { id: 8, emoji: "🎮", name: "Experimentierkasten Astronomie", desc: "Bastelt Sonnensystem-Modelle und mehr", price: "ca. 28 €", url: "https://www.amazon.de/s?k=experimentierkasten+astronomie+kinder", taken: false }
 ];
 
+const BIN_URL = `https://api.jsonbin.io/v3/b/${process.env.JSONBIN_BIN_ID}/latest`;
+
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
@@ -16,9 +18,12 @@ export default async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(204).end();
 
   try {
-    const { kv } = await import('@vercel/kv');
-    const data = await kv.get('gifts');
-    return res.status(200).json({ gifts: data ?? DEFAULT_GIFTS });
+    const r = await fetch(BIN_URL, {
+      headers: { 'X-Master-Key': process.env.JSONBIN_KEY }
+    });
+    if (!r.ok) throw new Error('bin read failed');
+    const json = await r.json();
+    return res.status(200).json({ gifts: json.record ?? DEFAULT_GIFTS });
   } catch {
     return res.status(200).json({ gifts: DEFAULT_GIFTS });
   }

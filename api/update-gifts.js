@@ -1,3 +1,5 @@
+const BIN_URL = `https://api.jsonbin.io/v3/b/${process.env.JSONBIN_BIN_ID}`;
+
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
@@ -14,12 +16,16 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: 'Invalid gifts data' });
   }
 
-  try {
-    const { kv } = await import('@vercel/kv');
-    await kv.set('gifts', gifts);
-  } catch {
-    // KV not configured — password was correct, changes won't persist across cold starts
-  }
+  const r = await fetch(BIN_URL, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Master-Key': process.env.JSONBIN_KEY
+    },
+    body: JSON.stringify(gifts)
+  });
+
+  if (!r.ok) return res.status(502).json({ error: 'Storage write failed' });
 
   return res.status(200).json({ ok: true });
 }
