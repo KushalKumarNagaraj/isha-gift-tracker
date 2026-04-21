@@ -6,13 +6,11 @@ export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
   if (req.method === 'OPTIONS') return res.status(204).end();
 
-  // Parse body explicitly — Vercel may or may not auto-parse
   let body = req.body;
   if (typeof body === 'string') {
     try { body = JSON.parse(body); } catch { body = {}; }
   }
   if (!body || typeof body !== 'object') {
-    // Read raw body as fallback
     try {
       const raw = await new Promise((resolve, reject) => {
         let data = '';
@@ -24,11 +22,7 @@ export default async function handler(req, res) {
     } catch { body = {}; }
   }
 
-  const { password, gifts } = body;
-
-  if (!password || password !== (process.env.ADMIN_PASSWORD || '02122022')) {
-    return res.status(401).json({ error: 'Unauthorized' });
-  }
+  const { gifts } = body;
 
   if (!Array.isArray(gifts)) {
     return res.status(400).json({ error: 'Invalid gifts data' });
