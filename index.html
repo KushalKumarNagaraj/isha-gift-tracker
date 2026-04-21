@@ -542,7 +542,7 @@ async function saveGifts() {
     if (!res.ok) throw new Error(await res.text());
     showToast(T[lang].toastSaved);
   } catch(e) {
-    showToast(T[lang].toastSaveFail);
+    showToast("⚠️ " + (e.message || T[lang].toastSaveFail));
   } finally {
     setLoading(false);
   }
