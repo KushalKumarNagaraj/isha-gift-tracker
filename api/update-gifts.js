@@ -16,16 +16,19 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: 'Invalid gifts data' });
   }
 
-  const r = await fetch(BIN_URL, {
-    method: 'PUT',
-    headers: {
-      'Content-Type': 'application/json',
-      'X-Master-Key': process.env.JSONBIN_KEY
-    },
-    body: JSON.stringify(gifts)
-  });
-
-  if (!r.ok) return res.status(502).json({ error: 'Storage write failed' });
+  // Attempt to persist — failure does not block the admin unlock
+  if (process.env.JSONBIN_BIN_ID && process.env.JSONBIN_KEY) {
+    try {
+      await fetch(BIN_URL, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Master-Key': process.env.JSONBIN_KEY
+        },
+        body: JSON.stringify(gifts)
+      });
+    } catch { /* ignore */ }
+  }
 
   return res.status(200).json({ ok: true });
 }
