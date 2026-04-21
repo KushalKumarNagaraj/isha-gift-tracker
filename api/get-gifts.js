@@ -9,22 +9,50 @@ const DEFAULT_GIFTS = [
   { id: 8, emoji: "🎮", name: "Experimentierkasten Astronomie", desc: "Bastelt Sonnensystem-Modelle und mehr", price: "ca. 28 €", url: "https://www.amazon.de/s?k=experimentierkasten+astronomie+kinder", taken: false }
 ];
 
-const BIN_URL = `https://api.jsonbin.io/v3/b/${process.env.JSONBIN_BIN_ID}/latest`;
-
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
   if (req.method === 'OPTIONS') return res.status(204).end();
 
-  try {
-    const r = await fetch(BIN_URL, {
-      headers: { 'X-Master-Key': process.env.JSONBIN_KEY }
+  const binId = process.env.JSONBIN_BIN_ID;
+  const key = process.env.JSONBIN_KEY;
+
+  if (!binId || !key) {
+    return res.status(200).json({
+      gifts: DEFAULT_GIFTS,
+      _diag: {
+        hasBinId: !!binId,
+        hasKey: !!key,
+        keyLen: key ? key.length : 0
+      }
     });
-    if (!r.ok) throw new Error('bin read failed');
-    const json = await r.json();
-    return res.status(200).json({ gifts: json.record ?? DEFAULT_GIFTS });
-  } catch {
-    return res.status(200).json({ gifts: DEFAULT_GIFTS });
+  }
+
+  try {
+    const r = await fetch(`https://api.jsonbin.io/v3/b/${binId}/latest`, {
+      headers: { 'X-Master-Key': key }
+    });
+    const text = await r.text();
+    if (!r.ok) {
+      return res.status(200).json({
+        gifts: DEFAULT_GIFTS,
+        _diag: { status: r.status, body: text.slice(0, 200) }
+      });
+    }
+    const json = JSON.parse(text);
+    const record = json.record;
+    if (Array.isArray(record)) {
+      return res.status(200).json({ gifts: record });
+    }
+    return res.status(200).json({
+      gifts: DEFAULT_GIFTS,
+      _diag: { recordType: typeof record, isArray: Array.isArray(record), sample: JSON.stringify(record).slice(0, 200) }
+    });
+  } catch (e) {
+    return res.status(200).json({
+      gifts: DEFAULT_GIFTS,
+      _diag: { error: e.message }
+    });
   }
 }
